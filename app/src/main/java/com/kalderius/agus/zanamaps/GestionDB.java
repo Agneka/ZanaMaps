@@ -69,6 +69,7 @@ public class GestionDB {
                 lista.add(p);
             }
         }
+        c.close();
         return lista;
     }
     public void marcarVisto(Punto punto){
