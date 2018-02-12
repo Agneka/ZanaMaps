@@ -56,7 +56,8 @@ public class GestionDB {
         String[] atributos=new String[5];
         Cursor c=db.rawQuery(select,null);
         if (c.moveToFirst()){
-            while (c!=null){
+            int i= 0;
+            while (i< c.getCount()){
                 atributos[0]=c.getString(c.getColumnIndex("id"));
                 atributos[1]=c.getString(c.getColumnIndex("nombre"));
                 atributos[2]=c.getString(c.getColumnIndex("coorX"));
@@ -68,6 +69,8 @@ public class GestionDB {
                     p = new Punto(atributos[1], atributos[2], atributos[3], true);
                 }
                 lista.add(p);
+                c.moveToNext();
+                i++;
             }
         }
         c.close();

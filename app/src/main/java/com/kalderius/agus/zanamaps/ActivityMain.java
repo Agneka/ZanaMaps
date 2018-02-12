@@ -12,6 +12,9 @@ import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,18 +27,20 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.sql.SQLOutput;
+import java.util.List;
 
 import static java.lang.Thread.sleep;
 
-public class ActivityMain extends FragmentActivity implements OnMapReadyCallback {
+public class ActivityMain extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private MarkerOptions posicionActual;
+    private Marker marker;
     private LatLng coord;
     private LocationManager locmanager;
     private Location loca;
     private Escuchador escuchador;
     private GestionDB gestion;
+    private Menu menu;
 
     public GestionDB getGestion() {
         return gestion;
@@ -70,11 +75,18 @@ public class ActivityMain extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        posicionActual = new MarkerOptions();
 
         loca = locmanager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
 
+
+    public GoogleMap getmMap() {
+        return mMap;
+    }
+
+    public void setmMap(GoogleMap mMap) {
+        this.mMap = mMap;
+    }
 
     /**
      * Manipulates the map once available.
@@ -87,6 +99,7 @@ public class ActivityMain extends FragmentActivity implements OnMapReadyCallback
      */
 
 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -97,6 +110,15 @@ public class ActivityMain extends FragmentActivity implements OnMapReadyCallback
                 gestion.insertar(new Punto("prueba",String.valueOf(latLng.latitude),String.valueOf(latLng.longitude),false));
             }
         });
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                menu.setGroupEnabled(R.id.menu1, true);
+
+                return true;
+            }
+        });
+
         // Add a marker in Sydney and move the camera
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -112,6 +134,7 @@ public class ActivityMain extends FragmentActivity implements OnMapReadyCallback
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        colocar(gestion.recuperarPuntos());
         System.out.println(loca.getLatitude());
         coord = new LatLng(loca.getLatitude(), loca.getLongitude());
         System.out.println("LONGITUD: "+loca.getLongitude());
@@ -121,5 +144,20 @@ public class ActivityMain extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    public void colocar(List lista){
+        for (Object o : lista) {
+            Punto p = (Punto) o;
+            Location loc = new Location(LocationManager.GPS_PROVIDER);
+            loc.setLatitude(Double.parseDouble(p.getCoorx()));
+            loc.setLongitude(Double.parseDouble(p.getCoory()));
+            mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("PRUEBA").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        }
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
+        getMenuInflater().inflate(R.menu.menu_en_activity, menu);
+        return true;
+    }
 }

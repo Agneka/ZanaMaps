@@ -2,4 +2,5 @@
     <string name="app_name">ZanaMaps</string>
     <string name="title_activity_main">Map</string>
     <string name="valorcheck">SI</string>
+    <string name="monigote">Vista de calle</string>
 </resources>
