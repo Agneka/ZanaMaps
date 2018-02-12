@@ -16,6 +16,7 @@ public class GestionDB {
 
     public GestionDB(ActivityMain act) {
         this.db=act.openOrCreateDatabase("PuntosDB",act.MODE_PRIVATE,null);
+        crearTabla();
     }
     public void crearTabla(){
         String crear="CREATE TABLE IF NOT EXISTS Puntos(id INTEGER PRIMARY KEY, nombre VARCHAR(100),coorX VARCHAR(250), coorY VARCHAR(250), visitado INTEGER );";
