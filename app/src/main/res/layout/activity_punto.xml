@@ -46,16 +46,17 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView2"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="46dp"
         android:text="GUARDAR" />
 
     <CheckBox
-        android:id="@+id/checkBox"
+        android:id="@+id/visi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/textView2"
         android:layout_alignStart="@+id/nom"
-        android:text="SI"
+        android:checked="false"
         android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:text="SI" />
 </RelativeLayout>

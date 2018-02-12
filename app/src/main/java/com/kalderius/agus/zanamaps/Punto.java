@@ -1,10 +1,12 @@
 package com.kalderius.agus.zanamaps;
 
+import java.io.Serializable;
+
 /**
  * Created by MIGUE on 12/02/2018.
  */
 
-public class Punto {
+public class Punto implements Serializable {
     private int id;
     private String nombre;
     private String coorx;
