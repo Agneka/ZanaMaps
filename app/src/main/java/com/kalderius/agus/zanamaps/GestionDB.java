@@ -46,7 +46,7 @@ public class GestionDB {
 
     }
     public void eliminar(Punto punto){
-        String delete="DELETE FROM Puntos WHERE id=" + punto.getId() + ";";
+        String delete="DELETE FROM Puntos WHERE coorX='" + punto.getCoorx() + "' AND coorY='"+ punto.getCoory() + "';";
         db.execSQL(delete);
     }
     public ArrayList recuperarPuntos(){
