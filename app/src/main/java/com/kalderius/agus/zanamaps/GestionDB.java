@@ -29,8 +29,14 @@ public class GestionDB {
         }else {
             visitado="0";
         }
+        String select ="SELECT COUNT(*) FROM Puntos;";
+        Cursor c=db.rawQuery(select,null);
+        c.moveToFirst();
+        String id=c.getString(0);
+        punto.setId(Integer.parseInt(id));
+        c.close();
         String insert= "INSERT INTO Puntos VALUES("+
-                punto.getId() + "," +
+                id + "," +
                 "'" + punto.getNombre() + "'," +
                 "'" + punto.getCoorx() + "'," +
                 "'" + punto.getCoory() + "'," +
