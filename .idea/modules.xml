@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ZanaMaps.iml" filepath="$PROJECT_DIR$/ZanaMaps.iml" />
+      <module fileurl="file://C:\PMDM\ZanaMaps\ZanaMaps.iml" filepath="C:\PMDM\ZanaMaps\ZanaMaps.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\PMDM\ZanaMaps\app\app.iml" filepath="C:\PMDM\ZanaMaps\app\app.iml" />
     </modules>
   </component>
 </project>
