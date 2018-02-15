@@ -21,6 +21,7 @@ public class GestionDB {
     public void crearTabla(){
         String crear="CREATE TABLE IF NOT EXISTS Puntos(id INTEGER PRIMARY KEY, nombre VARCHAR(100),coorX VARCHAR(250), coorY VARCHAR(250), visitado INTEGER );";
         db.execSQL(crear);
+        //db.execSQL("delete from puntos");
 
     }
     public void insertar(Punto punto){
@@ -30,12 +31,22 @@ public class GestionDB {
         }else {
             visitado="0";
         }
-        String select ="SELECT COUNT(*) FROM Puntos;";
-        Cursor c=db.rawQuery(select,null);
-        c.moveToFirst();
-        String id=c.getString(0);
-        punto.setId(Integer.parseInt(id));
-        c.close();
+        int id;
+        Cursor c=null;
+        String select ="SELECT max(id) FROM Puntos;";
+
+        try{
+           c = db.rawQuery(select,null);
+            c.moveToFirst();
+            id=c.getInt(0)+1;
+
+
+        }catch(Exception ex){
+            id = 1;
+        }
+
+        if (c!= null)c.close();
+
         String insert= "INSERT INTO Puntos VALUES("+
                 id + "," +
                 "'" + punto.getNombre() + "'," +
@@ -63,7 +74,8 @@ public class GestionDB {
                 atributos[2]=c.getString(c.getColumnIndex("coorX"));
                 atributos[3]=c.getString(c.getColumnIndex("coorY"));
                 atributos[4]=c.getString(c.getColumnIndex("visitado"));
-                if (atributos[4] == "0") {
+
+                if (atributos[4].equalsIgnoreCase("0")) {
                     p = new Punto(atributos[1], atributos[2], atributos[3], false);
                 }else {
                     p = new Punto(atributos[1], atributos[2], atributos[3], true);
@@ -77,7 +89,7 @@ public class GestionDB {
         return lista;
     }
     public void marcarVisto(Punto punto){
-        String update="UPDATE Puntos SET visitado=1 where id=" + punto.getId() + ";";
+        String update="UPDATE Puntos SET visitado=1 where coorX='" + punto.getCoorx() + "' AND coorY='"+ punto.getCoory() + "';";
         db.execSQL(update);
     }
 }

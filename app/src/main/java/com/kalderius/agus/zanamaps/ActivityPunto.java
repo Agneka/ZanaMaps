@@ -8,7 +8,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 
 public class ActivityPunto extends AppCompatActivity {
-
     //Declaramos los elementos de la vista
     EditText nomb;
     CheckBox check;

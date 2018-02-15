@@ -15,5 +15,9 @@
             android:icon="@drawable/monigote"
             android:title="@string/monigote"
             app:showAsAction="always" />
+        <item
+            android:id="@+id/ruta"
+            app:showAsAction="never"
+            android:title="@string/ruta"/>
     </group>
 </menu>

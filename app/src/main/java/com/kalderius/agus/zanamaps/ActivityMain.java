@@ -4,11 +4,13 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.sql.SQLOutput;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Thread.sleep;
@@ -34,13 +37,14 @@ import static java.lang.Thread.sleep;
 public class ActivityMain extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private Marker marker;
+    private Marker marcador;
     private LatLng coord;
     private LocationManager locmanager;
     private Location loca;
     private Escuchador escuchador;
     private GestionDB gestion;
     private Menu menu;
+    private List<Marker> lista;
 
     public GestionDB getGestion() {
         return gestion;
@@ -61,6 +65,7 @@ public class ActivityMain extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        lista = new ArrayList<Marker>();
         gestion = new GestionDB(this);
         this.escuchador = new Escuchador(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -69,6 +74,7 @@ public class ActivityMain extends AppCompatActivity implements OnMapReadyCallbac
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},PackageManager.PERMISSION_GRANTED);
 
         }
+
         locmanager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         setContentView(R.layout.activity_main);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -79,6 +85,24 @@ public class ActivityMain extends AppCompatActivity implements OnMapReadyCallbac
         loca = locmanager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.monigote:
+                Uri gmmIntentUri = Uri.parse("google.streetview:cbll="+marcador.getPosition().latitude+","+marcador.getPosition().longitude);
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                startActivity(mapIntent);
+                return true;
+            case R.id.ruta:
+                Uri uri = Uri.parse("google.navigation:q="+marcador.getPosition().latitude+","+marcador.getPosition().longitude);
+                Intent mIntent = new Intent(Intent.ACTION_VIEW, uri);
+                mIntent.setPackage("com.google.android.apps.maps");
+                startActivity(mIntent);
+                return true;
+        }
+        return true;
+    }
 
     public GoogleMap getmMap() {
         return mMap;
@@ -87,6 +111,8 @@ public class ActivityMain extends AppCompatActivity implements OnMapReadyCallbac
     public void setmMap(GoogleMap mMap) {
         this.mMap = mMap;
     }
+
+
 
     /**
      * Manipulates the map once available.
@@ -103,9 +129,9 @@ public class ActivityMain extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
-            public void onMapClick(LatLng latLng) {
+            public void onMapLongClick(LatLng latLng) {
                 mMap.addMarker(new MarkerOptions().position(latLng).title("PRUEBA").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                 gestion.insertar(new Punto("prueba",String.valueOf(latLng.latitude),String.valueOf(latLng.longitude),false));
             }
@@ -114,7 +140,8 @@ public class ActivityMain extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public boolean onMarkerClick(Marker marker) {
                 menu.setGroupEnabled(R.id.menu1, true);
-
+                marcador = marker;
+                marker.showInfoWindow();
                 return true;
             }
         });
@@ -128,7 +155,7 @@ public class ActivityMain extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         locmanager.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER, 0, 0, escuchador);
+                LocationManager.GPS_PROVIDER, 5, 0, escuchador);
         try {
             sleep(3000);
         } catch (InterruptedException e) {
@@ -137,20 +164,37 @@ public class ActivityMain extends AppCompatActivity implements OnMapReadyCallbac
         colocar(gestion.recuperarPuntos());
         System.out.println(loca.getLatitude());
         coord = new LatLng(loca.getLatitude(), loca.getLongitude());
-        System.out.println("LONGITUD: "+loca.getLongitude());
         mMap.setMyLocationEnabled(true);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord,50));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord,21));
 
     }
 
+
+    public List<Marker> getLista() {
+        return lista;
+    }
+
+    public void setLista(List<Marker> lista) {
+        this.lista = lista;
+    }
+
     public void colocar(List lista){
+
         for (Object o : lista) {
             Punto p = (Punto) o;
             Location loc = new Location(LocationManager.GPS_PROVIDER);
             loc.setLatitude(Double.parseDouble(p.getCoorx()));
             loc.setLongitude(Double.parseDouble(p.getCoory()));
-            mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("PRUEBA").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            Marker mark = null;
+            if (p.isVisitado()){
+                mark = mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("PRUEBA").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+            }
+            else{
+                 mark = mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("PRUEBA").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            }
+
+            this.lista.add(mark);
         }
     }
 
@@ -158,6 +202,7 @@ public class ActivityMain extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
         getMenuInflater().inflate(R.menu.menu_en_activity, menu);
+        menu.setGroupEnabled(R.id.menu1, false);
         return true;
     }
 }
