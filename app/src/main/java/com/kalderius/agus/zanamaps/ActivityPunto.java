@@ -3,6 +3,7 @@ package com.kalderius.agus.zanamaps;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -28,6 +29,13 @@ public class ActivityPunto extends AppCompatActivity {
         b = this.getIntent().getExtras();
         coorx=b.getString("coorx");
         coory=b.getString("coory");
+
+        guarda.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                guarda();
+            }
+        });
     }
 
     private void guarda(){
