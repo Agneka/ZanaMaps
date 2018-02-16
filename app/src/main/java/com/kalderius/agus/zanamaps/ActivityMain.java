@@ -45,6 +45,7 @@ public class ActivityMain extends AppCompatActivity implements OnMapReadyCallbac
     private GestionDB gestion;
     private Menu menu;
     private List<Marker> lista;
+    static final int markermapa=1;
 
     public GestionDB getGestion() {
         return gestion;
@@ -132,8 +133,19 @@ public class ActivityMain extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                mMap.addMarker(new MarkerOptions().position(latLng).title("PRUEBA").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                gestion.insertar(new Punto("prueba",String.valueOf(latLng.latitude),String.valueOf(latLng.longitude),false));
+
+                Intent intent=new Intent(ActivityMain.this,ActivityPunto.class);
+                Bundle b = new Bundle();
+                b.putString("coorx", String.valueOf(latLng.latitude));
+                b.putString("coory", String.valueOf(latLng.longitude));
+                //añadimos la info al intent
+                intent.putExtras(b);
+                //Enviamos el intent esperando un resultado de vuelta
+                startActivityForResult(intent,markermapa);
+
+
+                //mMap.addMarker(new MarkerOptions().position(latLng).title("PRUEBA").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                //gestion.insertar(new Punto("prueba",String.valueOf(latLng.latitude),String.valueOf(latLng.longitude),false));
             }
         });
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -205,4 +217,22 @@ public class ActivityMain extends AppCompatActivity implements OnMapReadyCallbac
         menu.setGroupEnabled(R.id.menu1, false);
         return true;
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == markermapa){
+
+            //Aqui recibimos el resultado del intent de crear una nueva nota
+            if(resultCode == RESULT_OK){
+                Punto punto = (Punto) data.getExtras().getSerializable("punto");
+                LatLng latlong= new LatLng(Double.valueOf(punto.getCoorx()),Double.valueOf(punto.getCoory()));
+                mMap.addMarker(new MarkerOptions().position(latlong).title(punto.getNombre()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                gestion.insertar(new Punto(punto.getNombre(),String.valueOf(punto.getCoorx()),String.valueOf(punto.getCoory()),false));
+            }
+
+        }
+
+    }
+
+
 }
