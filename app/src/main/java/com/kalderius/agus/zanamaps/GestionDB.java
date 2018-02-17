@@ -25,7 +25,7 @@ public class GestionDB {
     }
     public void crearTabla(){
 
-        //db.execSQL("delete from puntos");
+        db.execSQL("delete from puntos");
         String crear="CREATE TABLE IF NOT EXISTS Puntos(id INTEGER PRIMARY KEY, nombre VARCHAR(100),coorX VARCHAR(250), coorY VARCHAR(250), visitado INTEGER );";//sql de creacion de tabla
         db.execSQL(crear);//ejecucion del sql
 
